@@ -1,0 +1,12 @@
+<% @list = @list[0] %>
+
+<h2><%= @list[:name] %></h2>
+<% @list[:todos] << "meat" << "celery" %>
+<ul>
+  <% @list[:todos].each do |todo|%>
+    <li>
+     <p> <%= todo %></p>
+    </li>
+  <% end %>
+
+</ul>
