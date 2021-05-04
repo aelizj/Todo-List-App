@@ -8,6 +8,24 @@ configure do
   set :session_secret, 'secret'
 end
 
+helpers do
+  def list_complete?(list)
+    todos_count(list) > 0 && todos_remaining_count(list) == 0
+  end
+
+  def list_class(list)
+    "complete" if list_complete?(list)
+  end
+
+  def todos_remaining_count(list)
+    list[:todos].count { |todo| !todo[:completed] }
+  end
+
+  def todos_count(list)
+    list[:todos].size
+  end
+end
+
 before do
   session[:lists] ||= []
 end
@@ -16,8 +34,8 @@ get "/" do
   redirect "/lists"
 end
 
-
 #-----------------------------------------------------------------
+# PATH PLANNING
 # modified - makes it easier to guess the url that will achieve
 # a desired outcome
 
@@ -25,7 +43,7 @@ end
 # GET  /lists/new   -> new list form
 # POST /lists       -> create new list
 # GET  /list/1      -> view a single list
-# 
+
 #-----------------------------------------------------------------
 
 # View list of all lists
@@ -53,7 +71,7 @@ end
 # Create new list
 post "/lists" do
   list_name = params[:list_name].strip
-  
+
   error = error_for_list_name(list_name)
   if error
     session[:error] = error
@@ -134,7 +152,7 @@ post "/lists/:list_id/todos" do
     @list[:todos] << { name: todo_text, completed: false }
     session[:success] = "The to do item has been added!"
     redirect "/lists/#{@list_id}"
-  end  
+  end
 end
 
 #-----------------------------------------------------------------
@@ -146,7 +164,7 @@ post "/lists/:list_id/todos/:todo_id/delete" do
 
   @list[:todos].delete_at(todo_id)
   session[:success] = "The todo has been deleted."
-  redirect "/lists/#{@list_id}"  
+  redirect "/lists/#{@list_id}"
 end
 
 #-----------------------------------------------------------------
@@ -154,11 +172,11 @@ end
 post "/lists/:list_id/todos/:todo_id" do
   @list_id = params[:list_id].to_i
   @list = session[:lists][@list_id]
-  
+
   todo_id = params[:todo_id].to_i
   is_completed = params[:completed] == "true"
   @list[:todos][todo_id][:completed] = is_completed
-  
+
   session[:success] = "The to do has been updated!"
   redirect "/lists/#{@list_id}"
 end
@@ -174,3 +192,4 @@ post "/lists/:list_id/complete_all" do
 
   redirect "/lists/#{@list_id}"
 end
+
