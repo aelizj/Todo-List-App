@@ -100,7 +100,6 @@ def load_list(list_id)
 
   session[:error] = "We couldn't find that list."
   redirect "/lists"
-  end
 end
 
 # View speific to do list
