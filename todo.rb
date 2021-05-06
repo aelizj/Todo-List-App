@@ -183,7 +183,7 @@ post "/lists/:list_id/todos/:todo_id" do
   redirect "/lists/#{@list_id}"
 end
 
-# Mark as complete all items on a to do list
+# Mark all items on a to do list as complete 
 post "/lists/:list_id/complete_all" do
   @list_id = params[:list_id].to_i
   @list = session[:lists][@list_id]
