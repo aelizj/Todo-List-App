@@ -26,6 +26,7 @@ GEM
     tilt (2.0.10)
 
 PLATFORMS
+  x64-mingw32
   x86_64-linux
 
 DEPENDENCIES
