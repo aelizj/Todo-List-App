@@ -48,7 +48,6 @@ get "/" do
   redirect "/lists"
 end
 
-#-----------------------------------------------------------------
 # PATH PLANNING
 # modified - makes it easier to guess the url that will achieve
 # a desired outcome
@@ -58,20 +57,17 @@ end
 # POST /lists       -> create new list
 # GET  /list/1      -> view a single list
 
-#-----------------------------------------------------------------
 # View list of all lists
 get "/lists" do
   @lists = session[:lists]
   erb :lists, layout: :layout
 end
 
-#-----------------------------------------------------------------
 # Render new list form
 get "/lists/new" do
   erb :new_list, layout: :layout
 end
 
-#-----------------------------------------------------------------
 # Return error message if list name invalid, return nil otherwise
 def error_for_list_name(name)
   if !(1..100).cover? name.size
@@ -96,7 +92,6 @@ post "/lists" do
   end
 end
 
-#-----------------------------------------------------------------
 # View speific to do list
 get "/lists/:list_id" do
   @list_id = params[:list_id].to_i
@@ -104,7 +99,6 @@ get "/lists/:list_id" do
   erb :list, layout: :layout
 end
 
-#-----------------------------------------------------------------
 # Edit existing to do list
 get "/lists/:list_id/edit" do
   @list_id = params[:list_id].to_i
@@ -112,7 +106,6 @@ get "/lists/:list_id/edit" do
   erb :edit_list, layout: :layout
 end
 
-#-----------------------------------------------------------------
 # Update existing to do list
 post "/lists/:list_id" do
   @list_id = params[:list_id].to_i
@@ -134,7 +127,6 @@ post "/lists/:list_id" do
   end
 end
 
-#-----------------------------------------------------------------
 # Delete existing to do list
 post "/lists/:list_id/delete" do
   @list_id = params[:list_id].to_i
@@ -143,7 +135,6 @@ post "/lists/:list_id/delete" do
   redirect "/lists"
 end
 
-#-----------------------------------------------------------------
 # Return error message if to do text invalid, return nil otherwise
 def error_for_todo(todo)
   if !(1..100).cover? todo.size
@@ -168,7 +159,6 @@ post "/lists/:list_id/todos" do
   end
 end
 
-#-----------------------------------------------------------------
 # Delete a to do from a list
 post "/lists/:list_id/todos/:todo_id/delete" do
   @list_id = params[:list_id].to_i
@@ -180,7 +170,6 @@ post "/lists/:list_id/todos/:todo_id/delete" do
   redirect "/lists/#{@list_id}"
 end
 
-#-----------------------------------------------------------------
 # Update to do completion status
 post "/lists/:list_id/todos/:todo_id" do
   @list_id = params[:list_id].to_i
@@ -194,7 +183,6 @@ post "/lists/:list_id/todos/:todo_id" do
   redirect "/lists/#{@list_id}"
 end
 
-#-----------------------------------------------------------------
 # Mark as complete all items on a to do list
 post "/lists/:list_id/complete_all" do
   @list_id = params[:list_id].to_i
@@ -205,4 +193,3 @@ post "/lists/:list_id/complete_all" do
 
   redirect "/lists/#{@list_id}"
 end
-
