@@ -17,7 +17,7 @@
 
     <% if session[:success] %>
       <div class="flash success">
-        <p><% session.delete(:success) %>
+        <p><%= session.delete(:success) %>
       </div>
     <% end %>
 
