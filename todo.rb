@@ -93,11 +93,25 @@ post "/lists" do
   end
 end
 
+# Return error message if list_id invalid, return nil otherwise
+def error_for_list_id(list_id)
+  if session[:lists][list_id].nil?
+    "We couldn't find that list."
+  end
+end
+
 # View speific to do list
 get "/lists/:list_id" do
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
-  erb :list, layout: :layout
+
+  error = error_for_list_id(@list_id)
+  if error
+    session[:error] = error
+    redirect "/lists"
+  else
+    @list = session[:lists][@list_id]
+    erb :list, layout: :layout
+  end
 end
 
 # Edit existing to do list
