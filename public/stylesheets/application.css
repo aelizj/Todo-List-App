@@ -5,8 +5,8 @@ a {
 
 body {
   font: normal 20px "PT Sans", Helvetica, Arial, sans-serif;
-  color: #3f3f3f;
-  background: #ffffff; 
+  color: #ffffff;
+  background:darkslateblue; 
 }
 
 body > header {
@@ -217,7 +217,7 @@ form fieldset.actions a:hover {
 #todos header {
   padding: 15px 20px;
   border-radius: 6px;
-  background: #f6f6f6; 
+  background: darkslateblue; 
 }
 
 #todos header h2 {
