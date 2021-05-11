@@ -93,24 +93,33 @@ post "/lists" do
   end
 end
 
+# Return error message if list_id invalid, return nil otherwise
+def load_list(list_id)
+  list = session[:lists][list_id] if session[:lists][list_id] && list_id
+  return list if list
+
+  session[:error] = "We couldn't find that list."
+  redirect "/lists"
+end
+
 # View speific to do list
 get "/lists/:list_id" do
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
+  @list = load_list(@list_id)
   erb :list, layout: :layout
 end
 
 # Edit existing to do list
 get "/lists/:list_id/edit" do
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
+  @list = load_list(@list_id)
   erb :edit_list, layout: :layout
 end
 
 # Update existing to do list
 post "/lists/:list_id" do
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
+  @list = load_list(@list_id)
   list_name = params[:list_name].strip
   error = error_for_list_name(list_name)
 
@@ -146,7 +155,7 @@ end
 # Add a to do to a list
 post "/lists/:list_id/todos" do
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
+  @list = load_list(@list_id)
   todo_text = params[:todo].strip
 
   error = error_for_todo(todo_text)
@@ -163,7 +172,7 @@ end
 # Delete a to do from a list
 post "/lists/:list_id/todos/:todo_id/delete" do
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
+  @list = load_list(@list_id)
   todo_id = params[:todo_id].to_i
 
   @list[:todos].delete_at(todo_id)
@@ -174,7 +183,7 @@ end
 # Update to do completion status
 post "/lists/:list_id/todos/:todo_id" do
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
+  @list = load_list(@list_id)
 
   todo_id = params[:todo_id].to_i
   is_completed = params[:completed] == "true"
@@ -187,7 +196,7 @@ end
 # Mark all items on a to do list as complete 
 post "/lists/:list_id/complete_all" do
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
+  @list = load_list(@list_id)
 
   @list[:todos].each { |todo| todo[:completed] = true }
   session[:success] = "All to do items have been completed!"
