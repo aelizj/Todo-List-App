@@ -28,7 +28,7 @@ helpers do
 
   def sort_lists(lists, &block)
     complete_lists, incomplete_lists = lists.partition { |list| list_complete?(list) }
-    
+
     incomplete_lists.each(&block)
     complete_lists.each(&block)
   end
@@ -172,7 +172,7 @@ post "/lists/:list_id/todos" do
   else
     id = next_element_id(@list[:todos])
     @list[:todos] << { id: id, name: todo_text, completed: false }
-    
+
     session[:success] = "The to do item has been added!"
     redirect "/lists/#{@list_id}"
   end
@@ -182,7 +182,7 @@ end
 post "/lists/:list_id/todos/:todo_id/delete" do
   @list_id = params[:list_id].to_i
   @list = load_list(@list_id)
-  
+
   todo_id = params[:todo_id].to_i
   @list[:todos].reject! { |todo| todo[:id] == todo_id }
   if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
@@ -207,7 +207,7 @@ post "/lists/:list_id/todos/:todo_id" do
   redirect "/lists/#{@list_id}"
 end
 
-# Mark all items on a to do list as complete 
+# Mark all items on a to do list as complete
 post "/lists/:list_id/complete_all" do
   @list_id = params[:list_id].to_i
   @list = load_list(@list_id)
