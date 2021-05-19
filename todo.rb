@@ -3,12 +3,14 @@ require "sinatra/reloader" if development?
 require "sinatra/content_for"
 require "tilt/erubis"
 
+## CONFIG--------------------------------------------------------------------------------
 configure do
   enable :sessions
   set :session_secret, 'secret'
   set :erb, :escape_html => true
 end
 
+## HELPER METHODS------------------------------------------------------------------------
 helpers do
   def list_complete?(list)
     todos_count(list) > 0 && todos_remaining_count(list) == 0
@@ -41,6 +43,7 @@ helpers do
   end
 end
 
+## METHODS-------------------------------------------------------------------------------
 # Return error message if list_id invalid, return nil otherwise
 def load_list(list_id)
   list = session[:lists].find { |list| list[:id] == list_id }
@@ -50,6 +53,7 @@ def load_list(list_id)
   redirect "/lists"
 end
 
+# Return the next available id number for to do items
 def next_element_id(elements)
   max = elements.map { |el| el[:id] }.max || 0
   max + 1
@@ -71,6 +75,7 @@ def error_for_todo(todo)
   end
 end
 
+## ROUTES--------------------------------------------------------------------------------
 before do
   session[:lists] ||= []
 end
@@ -111,8 +116,8 @@ end
 get "/lists/:list_id" do
   @list_id = params[:list_id].to_i
   @list = load_list(@list_id)
-  @list_name = @list[:name]
-  @list_id = @list[:id]
+  @list_name = @list[:name]  #? Necessary?
+  @list_id = @list[:id]      #? Necessary?
 
   @todos = @list[:todos]
   erb :list, layout: :layout
