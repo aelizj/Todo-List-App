@@ -7,4 +7,15 @@ post "/lists/:id/todos" do
 end
 
 
-<% params[:todo] %>
+<% params[:todo] 
+
+
+
+# PATH PLANNING
+# modified - makes it easier to guess the url that will achieve
+# a desired outcome
+
+# GET  /lists       -> view all lists
+# GET  /lists/new   -> new list form
+# POST /lists       -> create new list
+# GET  /list/1      -> view a single list
