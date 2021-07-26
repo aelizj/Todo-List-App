@@ -29,16 +29,45 @@ helpers do
   def sort_lists(lists, &block)
     complete_lists, incomplete_lists = lists.partition { |list| list_complete?(list) }
 
-    incomplete_lists.each{ |list| yield list, lists.index(list) }
-    complete_lists.each{ |list| yield list, lists.index(list) }
+    incomplete_lists.each { |list| yield list, lists.index(list) }
+    complete_lists.each { |list| yield list, lists.index(list) }
   end
 
   def sort_todos(todos, &block)
     complete_todos, incomplete_todos = todos.partition { |todo| todo[:completed] }
 
-    incomplete_todos.each{ |todo| yield todo, todos.index(todo) }
-    complete_todos.each{ |todo| yield todo, todos.index(todo) }
+    incomplete_todos.each { |todo| yield todo, todos.index(todo) }
+    complete_todos.each { |todo| yield todo, todos.index(todo) }
   end
+end
+
+# Return error message if list_id invalid, return nil otherwise
+def load_list(list_id)
+  list = session[:lists][list_id] if session[:lists][list_id] && list_id
+  return list if list
+  session[:error] = "We couldn't find that list."
+  redirect "/lists"
+end
+
+# Return error message if list name invalid, return nil otherwise
+def error_for_list_name(name)
+  if !(1..100).cover? name.size
+    "List name must be between 1 and 100 characters long."
+  elsif session[:lists].any? { |list| list[:name] == name }
+    "List name must be unique."
+  end
+end
+
+# Return error message if to do text invalid, return nil otherwise
+def error_for_todo(todo)
+  if !(1..100).cover? todo.size
+    "To do must be between 1 and 100 characters long."
+  end
+end
+
+def next_element_id(els)
+  max = els.map { |todo| todo[:id] }.max || 0
+  max + 1
 end
 
 before do
@@ -48,15 +77,6 @@ end
 get "/" do
   redirect "/lists"
 end
-
-# PATH PLANNING
-# modified - makes it easier to guess the url that will achieve
-# a desired outcome
-
-# GET  /lists       -> view all lists
-# GET  /lists/new   -> new list form
-# POST /lists       -> create new list
-# GET  /list/1      -> view a single list
 
 # View list of all lists
 get "/lists" do
@@ -69,15 +89,6 @@ get "/lists/new" do
   erb :new_list, layout: :layout
 end
 
-# Return error message if list name invalid, return nil otherwise
-def error_for_list_name(name)
-  if !(1..100).cover? name.size
-    "List name must be between 1 and 100 characters long."
-  elsif session[:lists].any? { |list| list[:name] == name }
-    "List name must be unique."
-  end
-end
-
 # Create new list
 post "/lists" do
   list_name = params[:list_name].strip
@@ -87,19 +98,11 @@ post "/lists" do
     session[:error] = error
     erb :new_list, layout: :layout
   else
-    session[:lists] << {name: list_name, todos: []}
+    id = next_element_id(session[:lists])
+    session[:lists] << {id: id, name: list_name, todos: []}
     session[:success] = "The list has been created!"
     redirect "/lists"
   end
-end
-
-# Return error message if list_id invalid, return nil otherwise
-def load_list(list_id)
-  list = session[:lists][list_id] if session[:lists][list_id] && list_id
-  return list if list
-
-  session[:error] = "We couldn't find that list."
-  redirect "/lists"
 end
 
 # View speific to do list
@@ -145,13 +148,6 @@ post "/lists/:list_id/delete" do
   redirect "/lists"
 end
 
-# Return error message if to do text invalid, return nil otherwise
-def error_for_todo(todo)
-  if !(1..100).cover? todo.size
-    "To do must be between 1 and 100 characters long."
-  end
-end
-
 # Add a to do to a list
 post "/lists/:list_id/todos" do
   @list_id = params[:list_id].to_i
@@ -163,7 +159,8 @@ post "/lists/:list_id/todos" do
     session[:error] = error
     erb :list, layout: :layout
   else
-    @list[:todos] << { name: todo_text, completed: false }
+    id = next_element_id(@list[:todos])
+    @list[:todos] << { id: id, name: todo_text, completed: false }
     session[:success] = "The to do item has been added!"
     redirect "/lists/#{@list_id}"
   end
