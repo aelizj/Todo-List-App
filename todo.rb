@@ -3,14 +3,14 @@ require "sinatra/reloader" if development?
 require "sinatra/content_for"
 require "tilt/erubis"
 
-## CONFIG--------------------------------------------------------------------------------
+## CONFIG----------------------------------------------------------------------
 configure do
   enable :sessions
   set :session_secret, 'secret'
   set :erb, :escape_html => true
 end
 
-## HELPER METHODS------------------------------------------------------------------------
+## HELPER METHODS--------------------------------------------------------------
 helpers do
   def list_complete?(list)
     todos_count(list) > 0 && todos_remaining_count(list) == 0
@@ -29,25 +29,29 @@ helpers do
   end
 
   def sort_lists(lists, &block)
-    complete_lists, incomplete_lists = lists.partition { |list| list_complete?(list) }
+    complete_lists, incomplete_lists = lists.partition do |list|
+      list_complete?(list)
+    end
 
     incomplete_lists.each(&block)
     complete_lists.each(&block)
   end
 
   def sort_todos(todos, &block)
-    complete_todos, incomplete_todos = todos.partition { |todo| todo[:completed] }
+    complete_todos, incomplete_todos = todos.partition do |todo|
+      todo[:completed]
+    end
 
     incomplete_todos.each(&block)
     complete_todos.each(&block)
   end
 end
 
-## METHODS-------------------------------------------------------------------------------
+## METHODS---------------------------------------------------------------------
 # Return error message if list_id invalid, return nil otherwise
 def load_list(list_id)
-  list = session[:lists].find { |list| list[:id] == list_id }
-  return list if list
+  list_to_load = session[:lists].find { |list| list[:id] == list_id }
+  return list_to_load if list_to_load
 
   session[:error] = "We couldn't find that list."
   redirect "/lists"
@@ -70,16 +74,11 @@ end
 
 # Return error message if to do text invalid, return nil otherwise
 def error_for_todo(todo)
-  if !(1..100).cover? todo.size
-    "To do must be between 1 and 100 characters long."
-  end
+  msg = "To do must be between 1 and 100 characters long."
+  return msg unless (1..100).cover? todo.size
 end
 
-def next_element_id(els)
-  max = els.map { |todo| todo[:id] }.max || 0
-  max + 1
-end
-
+## PATHING---------------------------------------------------------------------
 before do
   session[:lists] ||= []
 end
@@ -109,7 +108,7 @@ post "/lists" do
     erb :new_list, layout: :layout
   else
     id = next_element_id(session[:lists])
-    session[:lists] << { id: id, name: list_name, todos: []}
+    session[:lists] << { id: id, name: list_name, todos: [] }
 
     session[:success] = "The list has been created!"
     redirect "/lists"
@@ -120,8 +119,8 @@ end
 get "/lists/:list_id" do
   @list_id = params[:list_id].to_i
   @list = load_list(@list_id)
-  @list_name = @list[:name]  #? Necessary?
-  @list_id = @list[:id]      #? Necessary?
+  @list_name = @list[:name]
+  @list_id = @list[:id]
 
   @todos = @list[:todos]
   erb :list, layout: :layout
@@ -209,8 +208,8 @@ post "/lists/:list_id/todos/:todo_id" do
 
   todo_id = params[:todo_id].to_i
   is_completed = params[:completed] == "true"
-  todo = @list[:todos].find { |todo| todo[:id] == todo_id }
-  todo[:completed] = is_completed
+  todo_item = @list[:todos].find { |todo| todo[:id] == todo_id }
+  todo_item[:completed] = is_completed
 
   session[:success] = "The to do has been updated!"
   redirect "/lists/#{@list_id}"
