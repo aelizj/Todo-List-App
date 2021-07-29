@@ -168,42 +168,42 @@ post "/lists" do
 end
 
 # View a to do list
-get "/lists/:list_id" do
+get "/lists/:id" do
   @list_id = params[:id].to_i
   @list = load_list(@list_id)
   erb :list, layout: :layout
 end
 
 # Edit existing to do list
-get "/lists/:list_id/edit" do
-  @list_id = params[:id].to_i
-  @list = load_list(@list_id)
+get "/lists/:id/edit" do
+  id = params[:id].to_i
+  @list = load_list(id)
   erb :edit_list, layout: :layout
 end
 
 # Update existing to do list
-post "/lists/:list_id" do
+post "/lists/:id" do
   list_name = params[:list_name].strip
-  @list_id = params[:id].to_i
-  @list = load_list(@list_id)
+  id = params[:id].to_i
+  @list = load_list(id)
 
   error = error_for_list_name(list_name)
   if @list[:name] == list_name
-    @storage.update_list_name(@list_id, list_name)
+    @storage.update_list_name(id, list_name)
     session[:success] = "The list has been updated!"
-    redirect "/lists/#{@list_id}"
+    redirect "/lists/#{id}"
   elsif error
     session[:error] = error
     erb :edit_list, layout: :layout
   else
-    @storage.update_list_name(@list_id, list_name)
+    @storage.update_list_name(id, list_name)
     session[:success] = "The list has been updated!"
-    redirect "/lists/#{@list_id}"
+    redirect "/lists/#{id}"
   end
 end
 
 # Delete existing to do list
-post "/lists/:list_id/delete" do
+post "/lists/:id/delete" do
   id = params[:id].to_i
 
   @storage.delete_list(id)
@@ -263,7 +263,7 @@ post "/lists/:list_id/todos/:todo_id" do
 end
 
 # Mark all items on a to do list as complete
-post "/lists/:list_id/complete_all" do
+post "/lists/:id/complete_all" do
   @list_id = params[:id].to_i
   @list = load_list(@list_id)
 
