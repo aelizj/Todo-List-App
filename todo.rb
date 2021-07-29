@@ -55,7 +55,7 @@ class SessionPersistence
   end
 
   def find_list(id)
-    @session[:lists].find { |list| list[:id] == id }
+    @session[:lists].find { |l| l[:id] == id }
   end
 
   def all_lists
