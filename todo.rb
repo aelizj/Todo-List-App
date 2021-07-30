@@ -3,7 +3,7 @@ require "sinatra/reloader" if development?
 require "sinatra/content_for"
 require "tilt/erubis"
 
-require_relative "session_persistence"
+require_relative "database_persistence"
 
 ## CONFIG----------------------------------------------------------------------
 configure do
@@ -76,7 +76,7 @@ end
 
 ## PATHING---------------------------------------------------------------------
 before do
-  @storage = SessionPersistence.new(session)
+  @storage = DatabasePersistence.new
 end
 
 get "/" do
