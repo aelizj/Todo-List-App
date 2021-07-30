@@ -1,7 +1,7 @@
 require "pg"
 
 class DatabasePersistence
-  def initialize(session)
+  def initialize
     @db = PG.connect(dbname: "todos")
   end
 
