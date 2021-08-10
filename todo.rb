@@ -83,10 +83,6 @@ before do
   @storage = DatabasePersistence.new(logger)
 end
 
-after do
-  @storage.disconnect
-end
-
 get "/" do
   redirect "/lists"
 end
@@ -221,4 +217,8 @@ post "/lists/:id/complete_all" do
 
   session[:success] = "All to do items have been completed!"
   redirect "/lists/#{@list_id}"
+end
+
+after do
+  @storage.disconnect
 end
