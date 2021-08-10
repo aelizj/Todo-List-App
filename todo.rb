@@ -1,5 +1,4 @@
 require "sinatra"
-require "sinatra/reloader" if development?
 require "sinatra/content_for"
 require "tilt/erubis"
 
@@ -10,6 +9,11 @@ configure do
   enable :sessions
   set :session_secret, 'secret'
   set :erb, :escape_html => true
+end
+
+configure(:development) do
+  require "sinatra/reloader"
+  also_reload "database_persistence.rb"
 end
 
 ## HELPER METHODS--------------------------------------------------------------
@@ -76,7 +80,7 @@ end
 
 ## PATHING---------------------------------------------------------------------
 before do
-  @storage = DatabasePersistence.new
+  @storage = DatabasePersistence.new(logger)
 end
 
 get "/" do
@@ -109,7 +113,7 @@ post "/lists" do
   end
 end
 
-# View a to do list
+# View a single to do list
 get "/lists/:id" do
   @list_id = params[:id].to_i
   @list = load_list(@list_id)
