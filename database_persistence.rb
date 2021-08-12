@@ -25,7 +25,7 @@ class DatabasePersistence
         WHERE lists.id = $1
         GROUP BY lists.id
         ORDER BY lists.name;
-      SQL
+    SQL
 
     result = query(sql, id)
     return if result.ntuples == 0
@@ -44,7 +44,7 @@ class DatabasePersistence
         ORDER BY lists.name;
     SQL
 
-    query(sql).map{ |tuple| tuple_to_list_hash(tuple) }
+    query(sql).map { |tuple| tuple_to_list_hash(tuple) }
   end
 
   def create_new_list(list_name)
